@@ -2,8 +2,8 @@
 #include <napi.h>
 #include "Ap4CommonEncryption.h"
 
-void CleanUp(Napi::Env env, char* data, AP4_MemoryByteStream* stream) {
-  stream->Release();
+void CleanUp(Napi::Env /*env*/, char* /*data*/, AP4_MemoryByteStream* stream) {
+  if (stream) stream->Release();
 }
 
 class DecryptWorker : public Napi::AsyncWorker {
@@ -41,9 +41,13 @@ class DecryptWorker : public Napi::AsyncWorker {
       output = new AP4_MemoryByteStream();
 
       AP4_Processor* processor = new AP4_CencDecryptingProcessor(&key_map);
-      processor->Process(*input, *output, NULL);
+      AP4_Result result = processor->Process(*input, *output, NULL);
       delete processor;
       input->Release();
+
+      if (AP4_FAILED(result)) {
+        SetError("Decryption failed");
+      }
     }
 
     // Executed when the async work is complete
@@ -59,7 +63,12 @@ class DecryptWorker : public Napi::AsyncWorker {
         output
       );
 
-      Callback().Call({outBuffer});
+      Callback().Call({Env().Null(), outBuffer});
+      input_ref.Unref();
+    }
+
+    void OnError(const Napi::Error& e) {
+      Callback().Call({e.Value(), Env().Undefined()});
       input_ref.Unref();
     }
 };
