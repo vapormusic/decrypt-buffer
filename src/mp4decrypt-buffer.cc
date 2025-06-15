@@ -9,12 +9,17 @@ void CleanUp(Napi::Env env, char* data, AP4_MemoryByteStream* stream) {
 class DecryptWorker : public Napi::AsyncWorker {
   private:
     AP4_MemoryByteStream* input;
+    Napi::Reference<Napi::Buffer<char>> input_ref;
     AP4_MemoryByteStream* output;
     AP4_ProtectionKeyMap key_map;
 
   public:
-    DecryptWorker(Napi::Function& callback, AP4_MemoryByteStream* input, std::map<std::string, std::string>& keys)
-        : Napi::AsyncWorker(callback), input(input) { 
+    DecryptWorker(Napi::Function& callback, Napi::Buffer<char> buffer, std::map<std::string, std::string>& keys)
+        : Napi::AsyncWorker(callback) {
+          input_ref = Napi::Persistent(buffer);
+          input_ref.SuppressDestruct();
+          AP4_UI08* inputData = reinterpret_cast<AP4_UI08*>(buffer.Data());
+          input = new AP4_MemoryByteStream(inputData, buffer.ByteLength());
           std::map<std::string, std::string>::iterator it;
 
           for (it = keys.begin(); it != keys.end(); it++) {
@@ -55,6 +60,7 @@ class DecryptWorker : public Napi::AsyncWorker {
       );
 
       Callback().Call({outBuffer});
+      input_ref.Unref();
     }
 };
 
@@ -86,10 +92,7 @@ Napi::Value Decrypt(const Napi::CallbackInfo& info) {
     keys[hex_kid.Utf8Value()] = hex_key.Utf8Value();
   }
 
-  AP4_UI08* inputData = reinterpret_cast<AP4_UI08*>(buffer.Data());
-  AP4_MemoryByteStream* input = new AP4_MemoryByteStream(inputData, buffer.ByteLength());
-
-  DecryptWorker* worker = new DecryptWorker(callback, input, keys);
+  DecryptWorker* worker = new DecryptWorker(callback, buffer, keys);
   worker->Queue();
 
   return env.Undefined();
