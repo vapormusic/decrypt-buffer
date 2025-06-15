@@ -18,3 +18,11 @@ mp4decrypt.decrypt(encrypted, keys).then(decrypted => {
 
 ## Third-party software
 This repo links to [Bento4 v1.6.0.640](https://github.com/axiomatic-systems/Bento4/tree/v1.6.0-640) as a submodule.
+
+After cloning the repository make sure to pull the submodule as well:
+
+```bash
+git submodule update --init --recursive
+```
+
+Without Bento4 present the native module will fail to build.

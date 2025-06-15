@@ -14,7 +14,7 @@ const MP4Box = require('mp4box')
  */
 
 /**
- * @type {[Test]}
+ * @type {Test[]}
  */
 const tests = [
   {
