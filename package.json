@@ -38,6 +38,9 @@
     "mp4box": "^0.5.2",
     "standard": "^17.1.0"
   },
+  "binary": {
+    "napi_versions": [6]
+  },
   "standard": {
     "ignore": [
       "Bento4"
