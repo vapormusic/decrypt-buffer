@@ -8,9 +8,9 @@
     "test": "standard && node test/tests.js",
     "prebuild": "prebuild --compile --strip --tag-prefix '' --backend cmake-js",
     "build": "run-script-os",
-    "build:win32": "prebuild --platform win32 -r electron -t 30.0.4 --backend cmake-js",
-    "build:linux": "prebuild --platform linux -r electron -t 30.0.4 --backend cmake-js",
-    "build:darwin": "prebuild --platform darwin -r electron -t 30.0.4 --backend cmake-js && prebuild --platform darwin -a arm64 -r electron -t 30.0.4 --backend cmake-js",
+    "build:win32": "prebuild --platform win32 -r electron -t 30.0.4 --backend cmake-js && prebuild --platform win32 -r napi -t 6 --backend cmake-js",
+    "build:linux": "prebuild --platform linux -r electron -t 30.0.4 --backend cmake-js && prebuild --platform linux -r napi -t 6 --backend cmake-js",
+    "build:darwin": "prebuild --platform darwin -r electron -a x64 -t 30.0.4 --backend cmake-js && prebuild --platform darwin -r napi -a x64 -t 6 --backend cmake-js && prebuild --platform darwin -a arm64 -r electron -t 30.0.4 --backend cmake-js && prebuild --platform darwin -r napi -a arm64 -t 6 --backend cmake-js",
     "prebuild-install": "prebuild-install || (npm run rebuild || (true || VER>NUL))"
   },
   "keywords": [

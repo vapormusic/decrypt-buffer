@@ -45,10 +45,6 @@ jobs:
       - name: Build tar files
         run: yarn build
 
-      - name: Build Exe (Windows)
-        if: ${{ matrix.os == 'windows-latest' }}
-        run: yarn exe
-
       - name: Upload release assets
         uses: svenstaro/upload-release-action@v2
         with:
